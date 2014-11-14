@@ -85,7 +85,7 @@ func (s *TagStore) CmdPull(job *engine.Job) engine.Status {
 		sf          = utils.NewStreamFormatter(job.GetenvBool("json"))
 		authConfig  = &registry.AuthConfig{}
 		metaHeaders map[string][]string
-		mirrors     []string
+		mirrors     = s.mirrors // Use provided mirrors, if any
 	)
 
 	if len(job.Args) > 1 {
@@ -132,9 +132,6 @@ func (s *TagStore) CmdPull(job *engine.Job) engine.Status {
 		if isOfficial && strings.IndexRune(remoteName, '/') == -1 {
 			remoteName = "library/" + remoteName
 		}
-
-		// Use provided mirrors, if any
-		mirrors = s.mirrors
 	}
 
 	logName := localName
@@ -170,7 +167,11 @@ func (s *TagStore) CmdPull(job *engine.Job) engine.Status {
 }
 
 func (s *TagStore) pullRepository(r *registry.Session, out io.Writer, localName, remoteName, askedTag string, sf *utils.StreamFormatter, parallel bool, mirrors []string) error {
-	out.Write(sf.FormatStatus("", "Pulling repository %s", localName))
+	statusMsg := fmt.Sprintf("Pulling repository %s", localName)
+	if len(mirrors) > 0 {
+		statusMsg = fmt.Sprintf("%s - with mirrors %v", statusMsg, mirrors)
+	}
+	out.Write(sf.FormatStatus("", statusMsg))
 
 	repoData, err := r.GetRepositoryData(remoteName)
 	if err != nil {
