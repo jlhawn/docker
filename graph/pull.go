@@ -158,7 +158,7 @@ func (s *TagStore) CmdPull(job *engine.Job) engine.Status {
 		}
 	}
 
-	if err = s.pullRepository(r, job.Stdout, localName, remoteName, tag, sf, job.GetenvBool("parallel"), mirrors); err != nil {
+	if err = s.pullRepository(r, job.Stdout, localName, remoteName, tag, sf, job.GetenvBool("parallel"), s.mirrors); err != nil {
 		return job.Error(err)
 	}
 
@@ -170,7 +170,7 @@ func (s *TagStore) CmdPull(job *engine.Job) engine.Status {
 }
 
 func (s *TagStore) pullRepository(r *registry.Session, out io.Writer, localName, remoteName, askedTag string, sf *utils.StreamFormatter, parallel bool, mirrors []string) error {
-	out.Write(sf.FormatStatus("", "Pulling repository %s", localName))
+	out.Write(sf.FormatStatus("", "Pulling repository %s - with mirrors %v", localName, mirrors))
 
 	repoData, err := r.GetRepositoryData(remoteName)
 	if err != nil {
