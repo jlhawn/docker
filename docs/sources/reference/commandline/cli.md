@@ -193,6 +193,13 @@ To set the DNS server for all Docker containers, use
 To set the DNS search domain for all Docker containers, use
 `docker -d --dns-search example.com`.
 
+### Daemon registry-mirror option
+
+To save on network bandwidth, it is useful to cache images close to the Docker instances using them.
+When an image is pulled from its upstream registry, if the `--registry-mirror` option is specified,
+the given mirrors are checked in order to see if they have a cached version before using the normal
+upstream registry.
+
 ### Miscellaneous options
 
 IP masquerading uses address translation to allow containers without a public IP to talk
